@@ -68,6 +68,7 @@ void loop(void) {
     } else {
       backlight = true;
     }
+
     delay(500);
   }
   
@@ -78,7 +79,8 @@ void loop(void) {
   }
 
   if (selectButtonState != lastSelectButtonState){
-    if (select < 3){
+    lcd.clearDisplay();
+    if (select < 4){
       select += 1;
     } else {
       select = 0;
@@ -88,55 +90,61 @@ void loop(void) {
   }
 
 
-
-
   unsigned long currentMillis = millis();
-  if(currentMillis - previousMillis > interval) {
-    previousMillis = currentMillis;
-    
-    // Frame
-    lcd.drawRect(1, 1, 83, 47, BLACK);
-    
-    // Menu black background
-    lcd.fillRect(2, 2, 82, 13, BLACK);
+  switch(select){
+    case 0:
+      if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis;
+      
+        draw_interface(select);
 
-    // Menu vertical separators
-    lcd.drawLine(18, 2, 18, 13, WHITE);
-    lcd.drawLine(34, 2, 34, 13, WHITE);
-    lcd.drawLine(50, 2, 50, 13, WHITE);
-    lcd.drawLine(66, 2, 66, 13, WHITE);
+        // Temperature line
+        lcd.setCursor(8, x_tempr);
+        lcd.print(bme.readTemperature()); 
+        lcd.setCursor(50, x_tempr);
+        lcd.print((char)9);lcd.print("C");
 
-    // Active white rect
-    lcd.fillRect(2, 2, 17, 13, WHITE);
+        // Pressure line
+        lcd.setCursor(8,x_press);
+        lcd.print(bme.readPressure()/133.3);lcd.print(" mmHg");
 
-    lcd.setTextSize(1);
-
-    // Menu Symbols
-    set_text( 6, 5, "#", BLACK);
-    set_text(23, 5, "t", WHITE);
-    set_text(39, 5, "P", WHITE);
-    set_text(55, 5, "H", WHITE);
-    set_text(71, 5, "Y", WHITE);
-
-
-    lcd.setTextColor(BLACK);
-
-    // Temperature line
-    lcd.setCursor(8, x_tempr);
-    lcd.print(bme.readTemperature()); 
-    lcd.setCursor(50, x_tempr);
-    lcd.print((char)9);lcd.print("C");
-
-    // Pressure line
-    lcd.setCursor(8,x_press);
-    lcd.print(bme.readPressure()/133.3);lcd.print(" mmHg");
-
-    // Humidity line
-    lcd.setCursor(8,x_humid);
-    lcd.print(bme.readHumidity());
-    set_text(50,x_humid,"%",BLACK);
-
-    lcd.clearDisplay();
+        // Humidity line
+        lcd.setCursor(8,x_humid);
+        lcd.print(bme.readHumidity());
+        set_text(50,x_humid,"%",BLACK);
+        
+        lcd.display();
+        lcd.clearDisplay();
+      }
+      break;
+    case 1:
+      if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis;
+      
+        draw_interface(select);
+      }
+      break;
+    case 2:
+      if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis;
+      
+        draw_interface(select);
+      }
+      break;
+    case 3:
+      if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis;
+      
+        draw_interface(select);
+      }
+      break;
+    case 4:
+      if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis;
+      
+        draw_interface(select);
+      }
+      break;
   }
 }
 
@@ -145,4 +153,70 @@ void set_text(int x, int y, String text, int color){
   lcd.setCursor(x,y);
   lcd.println(text);
   lcd.display();
+}
+
+void draw_interface(int s){
+
+    // Frame
+    lcd.drawRect(1, 1, 83, 47, BLACK);
+    lcd.display();
+    
+    //
+    switch(s){
+      case 0:
+        set_text( 6, 5, "#", BLACK);  
+        lcd.fillRect(19, 2, 83, 13, BLACK);
+        set_text(23, 5, "t", WHITE);
+        set_text(39, 5, "P", WHITE);
+        set_text(55, 5, "H", WHITE);
+        set_text(71, 5, "Y", WHITE);
+        break;
+      case 1:
+        lcd.fillRect(2, 2, 17, 13, BLACK);
+        set_text( 6, 5, "#", WHITE);  
+        set_text(23, 5, "t", BLACK);
+        lcd.fillRect(35, 2, 82, 13, BLACK);
+        set_text(39, 5, "P", WHITE);
+        set_text(55, 5, "H", WHITE);
+        set_text(71, 5, "Y", WHITE);
+        break;
+      case 2:
+        lcd.fillRect(2, 2, 33, 13, BLACK);
+        set_text( 6, 5, "#", WHITE);  
+        set_text(23, 5, "t", WHITE);
+        set_text(39, 5, "P", BLACK);
+        lcd.fillRect(51, 2, 82, 13, BLACK);
+        set_text(55, 5, "H", WHITE);
+        set_text(71, 5, "Y", WHITE);
+        break;
+      case 3:
+        lcd.fillRect(2, 2, 49, 13, BLACK);
+        set_text( 6, 5, "#", WHITE);  
+        set_text(23, 5, "t", WHITE);
+        set_text(39, 5, "P", WHITE);
+        set_text(55, 5, "H", BLACK);
+        lcd.fillRect(67, 2, 82, 13, BLACK);
+        set_text(71, 5, "Y", WHITE);
+        break;
+      case 4:
+        lcd.fillRect(2, 2, 65, 13, BLACK);
+        set_text( 6, 5, "#", WHITE);  
+        set_text(23, 5, "t", WHITE);
+        set_text(39, 5, "P", WHITE);
+        set_text(55, 5, "H", WHITE);
+        set_text(71, 5, "Y", BLACK);
+        break;
+    }
+
+    // Menu vertical separators
+    lcd.drawLine(18, 2, 18, 13, WHITE);
+    lcd.drawLine(34, 2, 34, 13, WHITE);
+    lcd.drawLine(50, 2, 50, 13, WHITE);
+    lcd.drawLine(66, 2, 66, 13, WHITE);
+    lcd.display();
+
+    lcd.setTextSize(1);
+
+    lcd.setTextColor(BLACK);
+    lcd.display();
 }
