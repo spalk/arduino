@@ -18,10 +18,16 @@ Adafruit_PCD8544 lcd = Adafruit_PCD8544(7, 6, 5, 4, 3);
 const int backlightPin = 9;
 boolean backlight = false;
 
-// D11 - backlight button 
+// D11 - backlight button pin
 const int backlightButtonPin = 11; 
 int BacklightButtonState = 0;
 int lastBacklightButtonState = 0;
+
+// D12 - select button pin
+const int selectButtonPin = 12; 
+int selectButtonState = 0; 
+int lastSelectButtonState = 0;
+int select = 0;
 
 long interval = 5000;
 long previousMillis = 0;
@@ -46,10 +52,15 @@ void setup() {
   pinMode(backlightButtonPin, INPUT_PULLUP);
   digitalWrite(backlightButtonPin,HIGH);
   lastBacklightButtonState = 1;
+
+  pinMode(selectButtonPin, INPUT_PULLUP);
+  digitalWrite(selectButtonPin,HIGH);
+  lastSelectButtonState = 1; 
 }
 
 void loop(void) { 
   BacklightButtonState = digitalRead(backlightButtonPin);
+  selectButtonState = digitalRead(selectButtonPin);
   
   if (BacklightButtonState != lastBacklightButtonState){
     if (backlight){
@@ -65,6 +76,19 @@ void loop(void) {
   } else {
     digitalWrite(backlightPin, HIGH);
   }
+
+  if (selectButtonState != lastSelectButtonState){
+    if (select < 3){
+      select += 1;
+    } else {
+      select = 0;
+    }
+    Serial.print(select);
+    delay(500);
+  }
+
+
+
 
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillis > interval) {
