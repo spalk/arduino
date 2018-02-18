@@ -3,16 +3,17 @@
 #include <Adafruit_BME280.h>
 #include <Wire.h>
 
-Adafruit_BME280 bme; // I2C
+// I2C
 // SDA - A4 (D18)
 // SCL - A5 (D19)
+Adafruit_BME280 bme; 
 
-Adafruit_PCD8544 lcd = Adafruit_PCD8544(7, 6, 5, 4, 3);
 // D7 - Serial clock out (CLK)
 // D6 - Serial data out (DIN)
 // D5 - Data/Command select (DC)
 // D4 - LCD chip select (CE)
 // D3 - LCD reset (RST)
+Adafruit_PCD8544 lcd = Adafruit_PCD8544(7, 6, 5, 4, 3);
 
 // D9 - backlight
 const int backlightPin = 9;
@@ -30,13 +31,32 @@ int lastSelectButtonState = 0;
 int select = 0;
 boolean pushed = false;
 
+// Refresh rait on main screen
 long interval = 5000;
 long previousMillis = 0;
 
-// Lines x-coordinates
+// Lines x-coordinates on main screen 
 int x_tempr = 18;
 int x_press = 28;
 int x_humid = 38;
+
+// Log data arrays
+int log_values_number = 82;
+int log_tempr[82];
+int log_press[82];
+int log_humid[82];
+
+// Frequency of logging data
+unsigned long previousLogMillis = millis();
+long interval_tempr = 5000;
+long interval_press = 5000;
+long interval_humid = 5000;
+
+// Log counters
+int count_tempr = log_values_number;
+int count_press = log_values_number;
+int count_humid = log_values_number;
+
 
 void setup() {
   lcd.begin();
@@ -60,6 +80,9 @@ void setup() {
 }
 
 void loop(void) { 
+
+  log_sensor_values();
+
   BacklightButtonState = digitalRead(backlightButtonPin);
   selectButtonState = digitalRead(selectButtonPin);
   
@@ -124,7 +147,15 @@ void loop(void) {
         previousMillis = currentMillis;
         if (pushed){pushed = false;}
       
+        
+        lcd.clearDisplay();
+
         draw_interface(select);
+
+        draw_graph(log_tempr, 23, 35);
+        //lcd.display();
+        
+
       }
       break;
     case 2:
@@ -162,12 +193,11 @@ void set_text(int x, int y, String text, int color){
 }
 
 void draw_interface(int s){
-
     // Frame
     lcd.drawRect(1, 1, 83, 47, BLACK);
     lcd.display();
     
-    //
+    // Menu header generating
     switch(s){
       case 0:
         set_text( 6, 5, "#", BLACK);  
@@ -225,4 +255,64 @@ void draw_interface(int s){
 
     lcd.setTextColor(BLACK);
     lcd.display();
+}
+
+void log_sensor_values(){
+  unsigned long curLogMillis = millis();
+
+  if (curLogMillis - previousLogMillis > interval_tempr){
+    previousLogMillis = curLogMillis;
+
+    int cur_tempr = bme.readTemperature();
+    
+    for (int i=0; i<log_values_number; i++){
+      log_tempr[i] = log_tempr[i+1];
+    }
+    log_tempr[log_values_number-1] = cur_tempr;
+  
+      
+    //for(int i = 0; i<log_values_number; i++){
+    //  Serial.print(log_tempr[i]);
+    //  Serial.print(" ");
+    //}
+    //Serial.println(" ");
+
+
+    //Serial.print(cur_tempr);
+    //Serial.print(" - ");
+    //Serial.println(count_tempr);
+  }
+
+  //int cur_press = bme.readPressure()/133.3;
+  //int cur_humid = bme.readHumidity();
+
+  
+  //Serial.println(cur_press);
+  //Serial.println(cur_humid);
+}
+
+
+void draw_graph(int data[], int min_val, int max_val){
+
+  // Calculating number of pixels in 1 vals. Zone for graph:
+  // 16 - top Y coordinate of screen
+  // 45 - bottom Y coordinate of screen
+  int top_y = 16;
+  int bot_y = 45;
+
+  int pix = round((bot_y-top_y)/(max_val-min_val));
+  for (int i; i<log_values_number; i++){
+    if (data[i] < max_val || data[i] > min_val){
+      lcd.drawPixel(i+2, top_y+pix*(max_val-data[i]), BLACK);
+      lcd.display();
+      /*Serial.print(i+2);
+      Serial.print(" ");
+      Serial.println(top_y+pix*(max_val-data[i]));
+      Serial.println(data[i]);
+      Serial.println(pix); */
+    }
+    
+  }
+
+
 }
