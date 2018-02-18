@@ -28,6 +28,7 @@ const int selectButtonPin = 12;
 int selectButtonState = 0; 
 int lastSelectButtonState = 0;
 int select = 0;
+boolean pushed = false;
 
 long interval = 5000;
 long previousMillis = 0;
@@ -80,6 +81,7 @@ void loop(void) {
 
   if (selectButtonState != lastSelectButtonState){
     lcd.clearDisplay();
+    pushed = true;
     if (select < 4){
       select += 1;
     } else {
@@ -89,12 +91,12 @@ void loop(void) {
     delay(500);
   }
 
-
   unsigned long currentMillis = millis();
   switch(select){
     case 0:
-      if(currentMillis - previousMillis > interval) {
+      if(currentMillis - previousMillis > interval || pushed) {
         previousMillis = currentMillis;
+        if (pushed){pushed = false;}
       
         draw_interface(select);
 
@@ -118,29 +120,33 @@ void loop(void) {
       }
       break;
     case 1:
-      if(currentMillis - previousMillis > interval) {
+      if(currentMillis - previousMillis > interval || pushed) {
         previousMillis = currentMillis;
+        if (pushed){pushed = false;}
       
         draw_interface(select);
       }
       break;
     case 2:
-      if(currentMillis - previousMillis > interval) {
+      if(currentMillis - previousMillis > interval || pushed) {
         previousMillis = currentMillis;
+        if (pushed){pushed = false;}
       
         draw_interface(select);
       }
       break;
     case 3:
-      if(currentMillis - previousMillis > interval) {
+      if(currentMillis - previousMillis > interval || pushed) {
         previousMillis = currentMillis;
+        if (pushed){pushed = false;}
       
         draw_interface(select);
       }
       break;
     case 4:
-      if(currentMillis - previousMillis > interval) {
+      if(currentMillis - previousMillis > interval || pushed) {
         previousMillis = currentMillis;
+        if (pushed){pushed = false;}
       
         draw_interface(select);
       }
@@ -172,7 +178,7 @@ void draw_interface(int s){
         set_text(71, 5, "Y", WHITE);
         break;
       case 1:
-        lcd.fillRect(2, 2, 17, 13, BLACK);
+        lcd.fillRect(2, 2, 16, 13, BLACK);
         set_text( 6, 5, "#", WHITE);  
         set_text(23, 5, "t", BLACK);
         lcd.fillRect(35, 2, 82, 13, BLACK);
@@ -181,7 +187,7 @@ void draw_interface(int s){
         set_text(71, 5, "Y", WHITE);
         break;
       case 2:
-        lcd.fillRect(2, 2, 33, 13, BLACK);
+        lcd.fillRect(2, 2, 32, 13, BLACK);
         set_text( 6, 5, "#", WHITE);  
         set_text(23, 5, "t", WHITE);
         set_text(39, 5, "P", BLACK);
@@ -190,7 +196,7 @@ void draw_interface(int s){
         set_text(71, 5, "Y", WHITE);
         break;
       case 3:
-        lcd.fillRect(2, 2, 49, 13, BLACK);
+        lcd.fillRect(2, 2, 48, 13, BLACK);
         set_text( 6, 5, "#", WHITE);  
         set_text(23, 5, "t", WHITE);
         set_text(39, 5, "P", WHITE);
@@ -199,7 +205,7 @@ void draw_interface(int s){
         set_text(71, 5, "Y", WHITE);
         break;
       case 4:
-        lcd.fillRect(2, 2, 65, 13, BLACK);
+        lcd.fillRect(2, 2, 64, 13, BLACK);
         set_text( 6, 5, "#", WHITE);  
         set_text(23, 5, "t", WHITE);
         set_text(39, 5, "P", WHITE);
